@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine Week Love Game</title>
+    <meta name="description" content="Fun Valentine Week Love Proposal Game! Answer romantic questions and see the magic happen.">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            color: white;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 3rem;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .question-box {
+            font-size: 2rem;
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            margin: 10px;
+        }
+        #yesButton {
+            background: #4caf50;
+            color: white;
+        }
+        #yesButton:hover {
+            background: #45a049;
+        }
+        #noButton {
+            background: #f44336;
+            color: white;
+            position: absolute;
+        }
+        #noButton:hover {
+            background: #e53935;
+        }
+        .final-message {
+            font-size: 3rem;
+            display: none;
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .falling-flowers {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .flower {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: url('https://i.ibb.co/0jQZ4zL/petal.png');
+            background-size: cover;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10%) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        .countdown {
+            font-size: 4rem;
+            margin-top: 20%;
+            animation: zoom 1s infinite;
+        }
+        @keyframes zoom {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff0;
+            animation: confetti-fall 5s linear infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-10%) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Valentine Love Game</h1>
+        <div id="entryPage">
+            <p>Enter your Name:</p>
+            <input type="text" id="userName" placeholder="Your Name">
+            <button onclick="startGame()">Start</button>
+        </div>
+        <div id="countdownPage" style="display: none;">
+            <div class="countdown" id="countdown"></div>
+        </div>
+        <div id="gamePage" style="display: none;">
+            <div class="question-box" id="question"></div>
+            <div class="buttons">
+                <button id="yesButton" onclick="nextQuestion()">Yes</button>
+                <button id="noButton" onmouseover="moveNoButton()">No</button>
+            </div>
+            <div id="imageContainer"></div>
+        </div>
+        <div id="finalMessage" class="final-message"></div>
+        <div id="shareButtons" style="display: none;">
+            <p>Share this with your love:</p>
+            <button onclick="shareGame()">❤️ Share on WhatsApp</button>
+        </div>
+    </div>
+
+    <div class="falling-flowers" id="flowerContainer"></div>
+    <div id="confettiContainer"></div>
+
+    <script>
+        let questions = [
+            "Will you be my Valentine?",
+            "Will you accept this rose from me?",
+            "Will you share chocolates with me?",
+            "Will you keep me like your teddy?",
+            "Will you promise to stay with me forever?",
+            "Can I have a warm hug from you?",
+            "Can I get a sweet kiss from you?",
+            "Will you be mine forever?"
+        ];
+        let images = [
+            "image/1.jpg",
+            "image/2.jpeg",
+            "image/3.jpeg",
+            "image/4.jpeg",
+            "image/5.jpeg",
+            "image/6.jpeg",
+            "image/7.jpeg",
+            "image/8.jpeg"
+        ];
+        let currentQuestion = 0;
+        let userName = "";
+
+        function startGame() {
+            userName = document.getElementById('userName').value;
+            if (userName.trim() === "") {
+                alert("Please enter your name!");
+                return;
+            }
+            document.getElementById('entryPage').style.display = 'none';
+            document.getElementById('countdownPage').style.display = 'block';
+            startCountdown();
+        }
+
+        function startCountdown() {
+            let countdown = 3; // 3-second countdown
+            let countdownElement = document.getElementById('countdown');
+            let countdownInterval = setInterval(() => {
+                countdownElement.textContent = countdown;
+                countdown--;
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdownPage').style.display = 'none';
+                    document.getElementById('gamePage').style.display = 'block';
+                    showQuestion();
+                }
+            }, 1000);
+        }
+
+        function showQuestion() {
+            document.getElementById('question').textContent = questions[currentQuestion];
+            document.getElementById('imageContainer').innerHTML = `<img src="${images[currentQuestion]}" width="300">`;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
+            } else {
+                showFinalMessage();
+            }
+        }
+
+        function moveNoButton() {
+            let noButton = document.getElementById('noButton');
+            let x = Math.random() * (window.innerWidth - 100);
+            let y = Math.random() * (window.innerHeight - 50);
+            noButton.style.left = `${x}px`;
+            noButton.style.top = `${y}px`;
+        }
+
+        function showFinalMessage() {
+            document.getElementById('gamePage').style.display = 'none';
+            document.getElementById('finalMessage').style.display = 'block';
+            document.getElementById('finalMessage').innerHTML = `I Love You ${userName} ❤️`;
+            startFlowerAnimation();
+            startConfettiAnimation();
+            document.getElementById('shareButtons').style.display = 'block';
+        }
+
+        function startFlowerAnimation() {
+            let flowerContainer = document.getElementById('flowerContainer');
+            for (let i = 0; i < 50; i++) {
+                let flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.style.left = `${Math.random() * 100}vw`;
+                flower.style.animationDuration = `${Math.random() * 5 + 3}s`;
+                flowerContainer.appendChild(flower);
+            }
+        }
+
+        function startConfettiAnimation() {
+            let confettiContainer = document.getElementById('confettiContainer');
+            for (let i = 0; i < 100; i++) {
+                let confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confettiContainer.appendChild(confetti);
+            }
+        }
+
+        function shareGame() {
+            let url = encodeURIComponent(window.location.href);
+            let message = encodeURIComponent(`Play this Valentine game with your love ❤️: ${url}`);
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
+        }
+    </script>
+</body>
+</html>
